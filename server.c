@@ -65,54 +65,52 @@ void *client_handler(void *socket_desc) {
 
 
 int main() {
-    int server_socket, client_socket;
-    struct sockaddr_in server_addr, client_addr;
-    socklen_t addr_len = sizeof(client_addr);
+	int server_socket, client_socket;
+    	struct sockaddr_in server_addr, client_addr;
+    	socklen_t addr_len = sizeof(client_addr);
 
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket == -1) {
-        perror("Can't create socket");
-        return 1;
-    }
+    	server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    	if (server_socket == -1) {
+        	perror("Can't create socket");
+        	return 1;
+    	}
 
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(PORT);
+    	memset(&server_addr, 0, sizeof(server_addr));
+    	server_addr.sin_family = AF_INET;
+    	server_addr.sin_addr.s_addr = INADDR_ANY;
+    	server_addr.sin_port = htons(PORT);
 
-    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
-        perror("Bind failed");
-        return 1;
-    }
+    	if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+        	perror("Bind failed");
+        	return 1;
+    	}
 
-    if (listen(server_socket, 3) == -1) {
-        perror("Listen failed");
-        return 1;
-    }
+    	if (listen(server_socket, 3) == -1) {
+        	perror("Listen failed");
+        	return 1;
+   	}
 
-    printf("Server started and waiting for connections...\n");
+    	printf("Server started and waiting for connections...\n");
 
-    while (1) {
-        client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &addr_len);
-        printf("Client connected\n");
+    	while (1) {
+        	client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &addr_len);
+        	printf("Client connected\n");
 
-        for (int i = 0; i < MAX_CLIENTS; i++) {
-            if (client_sockets[i] == 0) {
-                client_sockets[i] = client_socket;
-                pthread_t client_thread;
-                int *new_sock = malloc(1);
-                *new_sock = client_socket;
-
-                if (pthread_create(&client_thread, NULL, client_handler, (void *)new_sock) < 0) {
-                    perror("Could not create thread");
-                    return 1;
-                }
-                break;
-            }
-        }
-    }
-
-    close(server_socket);
-    return 0;
+        	for (int i = 0; i < MAX_CLIENTS; i++) {
+            		if (client_sockets[i] == 0) {
+                		client_sockets[i] = client_socket;
+                		pthread_t client_thread;
+                		int *new_sock = malloc(1);
+                		*new_sock = client_socket;
+                		if (pthread_create(&client_thread, NULL, client_handler, (void *)new_sock) < 0) {
+                    			perror("Could not create thread");
+                    			return 1;
+                		}
+                		break;
+            		}
+        	}
+    	}
+    	close(server_socket);
+    	return 0;
 }
 

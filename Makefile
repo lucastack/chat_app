@@ -1,7 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -lpthread
 
-# Targets
 all: server client
 
 server: server.c
